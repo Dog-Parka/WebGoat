@@ -90,6 +90,36 @@ pipeline { // 파이프라인 블록 시작
             }
         }
 
+        stage('Generate appspec.yaml') {
+            steps {
+                script {
+                    // 1. taskdef-patched.json을 기반으로 실제 task definition 등록
+                    def taskDefArn = sh(
+                        script: "aws ecs register-task-definition --cli-input-json file://taskdef-patched.json --query 'taskDefinition.taskDefinitionArn' --region ${AWS_REGION} --output text",
+                        returnStdout: true
+                    ).trim()
+
+            // 2. appspec.yaml을 문자열로 동적으로 생성
+            def appspec = """version: 1
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: "${taskDefArn}"
+        LoadBalancerInfo:
+          ContainerName: "webgoat-container"
+          ContainerPort: 8080
+"""
+
+                    // 3. appspec.yaml 파일로 저장
+                    writeFile file: 'appspec.yaml', text: appspec
+
+                    echo "Generated appspec.yaml:\n${appspec}"
+                }
+            }
+        }
+
+
         stage('Package and Upload to S3') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${AWS_ECR_CREDENTIAL_ID}"]]) {
