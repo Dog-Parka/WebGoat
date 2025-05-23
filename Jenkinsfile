@@ -14,7 +14,6 @@ pipeline { // 파이프라인 블록 시작
         GIT_CREDENTIALS_ID = 'Github_Dog-Parka' // Jenkins에 등록된 Git 인증 정보 ID
 
         // AWS ECR 관련 변수
-        AWS_ECR_CREDENTIAL_ID = 'AWS_IAM(WHS_mins)' // Jenkins에 등록된 AWS 인증 정보 ID
         AWS_ECR_URI = '688567267164.dkr.ecr.ap-northeast-2.amazonaws.com' // AWS ECR 리포지토리 URI (ex: 123456789012.dkr.ecr.ap-northeast-2.amazonaws.com)
         AWS_ECR_IMAGE_NAME = 'whs_test_repo' // ECR에 저장할 Docker 이미지 이름
         AWS_REGION = 'ap-northeast-2' // AWS 리전 (ex: ap-northeast-2)
@@ -68,13 +67,11 @@ pipeline { // 파이프라인 블록 시작
 
         stage('Push to ECR') { // ECR에 Docker 이미지 푸시
             steps {
-              withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${AWS_ECR_CREDENTIAL_ID}"]]) {
-                    script {
-                        sh '''
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ECR_URI}
-                        docker push ${AWS_ECR_URI}/${AWS_ECR_IMAGE_NAME}:latest
-                        '''
-                    }
+                script {
+                    sh '''
+                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ECR_URI}
+                    docker push ${AWS_ECR_URI}/${AWS_ECR_IMAGE_NAME}:latest
+                    '''
                 }
             }
         }
@@ -122,13 +119,11 @@ Resources:
 
         stage('Package and Upload to S3') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${AWS_ECR_CREDENTIAL_ID}"]]) {
-                    script {
-                        sh """
-                            zip -r deploy_bundle.zip appspec.yaml taskdef-patched.json
-                            aws s3 cp deploy_bundle.zip s3://${S3_BUCKET}/deploy_bundle-${BUILD_NUMBER}.zip --region ${AWS_REGION}
-                        """
-                    }
+                script {
+                    sh """
+                        zip -r deploy_bundle.zip appspec.yaml taskdef-patched.json
+                        aws s3 cp deploy_bundle.zip s3://${S3_BUCKET}/deploy_bundle-${BUILD_NUMBER}.zip --region ${AWS_REGION}
+                    """
                 }
             }
         }
