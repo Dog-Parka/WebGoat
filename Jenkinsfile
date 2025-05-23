@@ -116,7 +116,6 @@ pipeline { // 파이프라인 블록 시작
                 }
             }
         }
-    }
 
         stage('Clean Up Docker Images on Jenkins Server') { // Jenkins 서버의 Docker 이미지 정리
             steps {
