@@ -1,14 +1,26 @@
 version: 1
+
 Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
         TaskDefinition: <TASK_DEFINITION_PLACEHOLDER>
         LoadBalancerInfo:
-          ContainerName: webgoat-container  # ❗ 컨테이너 이름 (taskdef.json과 일치해야 함)
-          ContainerPort: 8080               # ❗ 컨테이너가 노출하는 포트
+          ContainerName: webgoat-container
+          ContainerPort: 8080
+
 DeploymentConfiguration:
   MaximumPercent: 200
   MinimumHealthyPercent: 100
+
 TrafficRoutingConfig:
-  Type: AllAtOnce  # 또는 TimeBasedCanary / TimeBasedLinear
+  Type: TimeBasedCanary
+  TimeBasedCanary:
+    interval: 1
+    percentage: 100
+
+Hooks:
+  AfterAllowTestTraffic:
+    - location: scripts/validate.sh
+      timeout: 180
+      runas: root
