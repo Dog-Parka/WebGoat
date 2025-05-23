@@ -92,12 +92,13 @@ pipeline { // 파이프라인 블록 시작
 
         stage('Package and Upload to S3') {
             steps {
-                script {
-                    // appspec.yaml과 태스크 정의를 zip으로 묶고 S3에 업로드
-                    sh """
-                        zip -r deploy_bundle.zip appspec.yaml taskdef-patched.json
-                        aws s3 cp deploy_bundle.zip s3://${S3_BUCKET}/deploy_bundle-${BUILD_NUMBER}.zip --region ${AWS_REGION}
-                    """
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${AWS_ECR_CREDENTIAL_ID}"]]) {
+                    script {
+                        sh """
+                            zip -r deploy_bundle.zip appspec.yaml taskdef-patched.json
+                            aws s3 cp deploy_bundle.zip s3://${S3_BUCKET}/deploy_bundle-${BUILD_NUMBER}.zip --region ${AWS_REGION}
+                        """
+                    }
                 }
             }
         }
