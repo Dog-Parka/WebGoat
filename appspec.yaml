@@ -8,6 +8,3 @@ Resources:
         LoadBalancerInfo:
           ContainerName: webgoat-container
           ContainerPort: 8080
-
-TrafficRoutingConfig:
-  Type: AllAtOnce
