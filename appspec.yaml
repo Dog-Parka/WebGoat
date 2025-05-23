@@ -4,17 +4,10 @@ Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
-        TaskDefinition: "<TASK_DEFINITION_PLACEHOLDER>"  # Jenkins에서 sed로 대체
+        TaskDefinition: "<TASK_DEFINITION_PLACEHOLDER>"
         LoadBalancerInfo:
-          ContainerName: webgoat-container              # ECS 태스크 정의에 등록된 컨테이너 이름
-          ContainerPort: 8080                           # 컨테이너에서 노출하는 포트
-
-DeploymentConfiguration:
-  MaximumPercent: 200                                   # 전체 태스크 수의 최대 200%까지 동시에 실행 가능
-  MinimumHealthyPercent: 100                            # 헬시 상태를 유지해야 할 최소 비율
+          ContainerName: webgoat-container
+          ContainerPort: 8080
 
 TrafficRoutingConfig:
-  Type: TimeBasedCanary
-  TimeBasedCanary:
-    interval: 1                                         # 1분 테스트 트래픽 유지 후 전체 전환
-    percentage: 100                                     # 전체 트래픽을 한 번에 전환 (사실상 AllAtOnce)
+  Type: AllAtOnce
