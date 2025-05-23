@@ -55,7 +55,7 @@ pipeline {
                 script { 
                     sh '''
                         docker build -t ${AWS_ECR_IMAGE_NAME} .
-                        docker tag ${AWS_ECR_IMAGE_NAME} ${AWS_ECR_URI}/${AWS_ECR_IMAGE_NAME}:${BUILD_NUMBER}
+                        docker tag ${AWS_ECR_IMAGE_NAME} ${AWS_ECR_URI}/${AWS_ECR_IMAGE_NAME}:latest
                     '''
                 }
             }
@@ -67,7 +67,7 @@ pipeline {
                     script {
                         sh '''
                         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ECR_URI}
-                        docker push ${AWS_ECR_URI}/${AWS_ECR_IMAGE_NAME}:${BUILD_NUMBER}
+                        docker push ${AWS_ECR_URI}/${AWS_ECR_IMAGE_NAME}:latest
                         '''
                     }
                 }
