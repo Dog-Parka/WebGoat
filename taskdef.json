@@ -1,11 +1,11 @@
 {
-  "family": "webgoat-task",  // ECS에서 관리할 태스크 그룹 이름
-  "executionRoleArn": "arn:aws:iam::688567267164:role/ecsTaskExecutionRole",  // ❗ 실제 계정의 역할 ARN
+  "family": "webgoat-task",
+  "executionRoleArn": "arn:aws:iam::688567267164:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
   "containerDefinitions": [
     {
-      "name": "webgoat-container",  // ❗ appspec.yaml과 반드시 일치
-      "image": "<IMAGE_URI>",       // Jenkins에서 sed로 치환됨
+      "name": "webgoat-container",
+      "image": "<IMAGE_URI>",
       "essential": true,
       "portMappings": [
         {
